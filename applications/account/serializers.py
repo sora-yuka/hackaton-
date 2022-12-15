@@ -4,9 +4,9 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 from .tasks import send_confirmation_email_celery
+from .send_mail import send_confirmation_email
 
 class RegisterSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(min_length=1)
     email = serializers.EmailField(required=True)
     password = serializers.CharField(min_length=6, required=True)
     password_confirm = serializers.CharField(min_length=6, required=True, write_only=True)
@@ -14,7 +14,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'password_confirm']
+        fields = ['email', 'password', 'password_confirm']
         
     
     def validate(self, attrs):
@@ -34,14 +34,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True)
-
-    def validate_email(self, username):
-        if not User.objects.filter(username=username).exists():
-            raise serializers.ValidationError('User not registred')
-        return username
 
     def validate_email(self, email):
         if not User.objects.filter(email=email).exists():
@@ -49,11 +43,9 @@ class LoginSerializer(serializers.Serializer):
         return email
 
     def validate(self, attrs):
-        username = attrs.get('username')
         email = attrs.get('email')
         password = attrs.get('password')
-        user = authenticate(username=username,
-                            email=email,
+        user = authenticate(username=email,
                             password=password)
         if not user:
             raise serializers.ValidationError('Invalid email or password')
@@ -125,7 +117,7 @@ class ForgotPasswordCompleteSerializer(serializers.Serializer):
         password1 = attrs.get('password')
         password2 = attrs.get('password_confirm')
         
-        if p1 != p2:
+        if password1 != password2:
             raise serializers.ValidationError('Passwords are not similar')
         return attrs
                   

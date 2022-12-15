@@ -9,6 +9,8 @@ from applications.account.views import (
     RegisterApiView, 
     Change_passwordApiView, 
     ActivationApiView,
+    ForgotPasswordApiView,
+    ForgotPasswordCompleteApiview,
 )
 
 
@@ -16,5 +18,6 @@ urlpatterns = [
     path('signup/', RegisterApiView.as_view()),
     path('signin/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('activate/<uuid:activation_code>/', ActivationApiView.as_view())
+    path('activate/<uuid:activation_code>/', ActivationApiView.as_view()),
+    # path('')
 ]
