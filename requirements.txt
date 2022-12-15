@@ -3,5 +3,8 @@ djangorestframework
 djangorestframework-simplejwt
 psycopg2-binary
 python-decouple
-dj-database-url
+dj-config-url
 pillow
+django-filter
+drf-yasg
+celery[redis]
