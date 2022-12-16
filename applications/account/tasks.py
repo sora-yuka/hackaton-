@@ -3,21 +3,19 @@ from main.celery import app
 
 @app.task
 def send_confirmation_email_celery(email, code):
-    full_link = f'http://localhost:8000/shop/activate/{code}'
-    
+    full_link = f"http://localhost:8000/shop/activate/{code}"
     send_mail(
-        'User activation',
-        f'Here is your code: {full_link}',
-        # full_link,
-        'sabyrkulov.nurmuhammed@gmail.com',
+        "User activation",
+        f"Here is your code: {full_link}",
+        "sabyrkulov.nurmuhammed@gmail.com",
         [email]
     )
     
 @app.task
-def send_confirmation_code(email, code):
+def send_confirmation_code_celery(email, confirm_code):
     send_mail(
-        'Password recovery',
-         code,
-        'sabyrkulov.nurmuhammed@gmail.com',
-        [email],
+        "Password recovery",
+        f"Here is your recovery code: {confirm_code}",
+        "sabyrkulov.nurmuhammed@gmail.com",
+        [email]
     )

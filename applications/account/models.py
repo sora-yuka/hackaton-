@@ -33,7 +33,6 @@ class UserManager(BaseUserManager):
             raise ValueError("Superuser must have is_superuser=True.")
 
         return self._create_user(email, password, **extra_fields)
-    
 
 
 class CustomUser(AbstractUser):
@@ -54,4 +53,9 @@ class CustomUser(AbstractUser):
     def create_activation_code(self):
         import uuid 
         code = str(uuid.uuid4())
-        self.activation_code = code 
+        self.activation_code = code
+        
+    def create_confirm_code(self):
+        import random
+        confirm_code = random.randint(0000, 9999)
+        self.confirm_code = confirm_code
