@@ -53,9 +53,9 @@ class ActivationApiView(APIView):
             user.is_active = True
             user.activation_code = ''
             user.save()
-            return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+            return Response({'message': 'success'}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
-            return Response({'msg': 'wrong code'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'wrong code'}, status=status.HTTP_400_BAD_REQUEST)
         
         
 
