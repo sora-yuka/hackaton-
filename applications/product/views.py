@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import status, mixins
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from applications.product.serializers import *
-from applications.product.models import Product, Category, Like, Rating, Comment
+from applications.product.models import Product, Category, Like, Rating, Comment, Favorite
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from applications.product.permissions import IsOwner, IsCommentOwner
@@ -52,6 +52,17 @@ class ProductApiView(ModelViewSet):
         rating_obj.save()
         
         return Response(request.data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=True, methods=['POST'])
+    def favorite(self, request, pk, *args, **kwargs):
+        favorite_obj, _ = Favorite.objects.get_or_create(product_id=pk, owner=request.user)
+        favorite_obj.favorite = not favorite_obj.favorite
+        favorite_obj.save()
+        status = 'added to favorite'
+        if not favorite_obj.favorite:
+            status = 'removed from favorite'
+            
+        return Response({'status': status})
     
 
 class CategoryApiView(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):

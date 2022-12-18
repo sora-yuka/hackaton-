@@ -40,8 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     
-    # modules
+    # pascages install
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
@@ -51,6 +52,8 @@ INSTALLED_APPS = [
     'applications.account',
     'applications.product'
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

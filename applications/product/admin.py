@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Product, Category, Image, Comment, Rating, Like
+    Product, Category, Image, Comment, Rating, Like, Favorite
 )
 
 
@@ -24,3 +24,4 @@ admin.site.register(Image)
 admin.site.register(Comment)
 admin.site.register(Rating)
 admin.site.register(Like)
+admin.site.register(Favorite)

@@ -34,6 +34,9 @@ class Product(models.Model):
 class Image(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='images/')
+    
+    def __str__(self):
+        return self.product
         
     
     
@@ -72,3 +75,12 @@ class Rating(models.Model):
     
     def __str__(self) -> str:
         return f'{self.owner} - {self.rating}'
+    
+    
+class Favorite(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite') 
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='favorite')
+    favorite = models.BooleanField(default=False)
+    
+    def __str__(self) -> str:
+        return f'{self.owner} - {self.favorite}'
