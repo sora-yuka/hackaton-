@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from rest_framework import status, mixins
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from applications.product.serializers import *
+from applications.product.serializers import ProductSerializer, RatingSerializer, CommentSerializer, FavoriteSerializer, CategorySerializer
 from applications.product.models import Product, Category, Like, Rating, Comment, Favorite
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from applications.product.permissions import IsOwner, IsCommentOwner
+from applications.product.permissions import IsOwnerOrReadOnly, IsCommentOwner
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -18,10 +18,10 @@ class LargeResultSetPagination(PageNumberPagination):
     max_page_size = 10000 
     
     
-class ProductApiView(ModelViewSet):
+class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsOwner]
+    permission_classes = [IsOwnerOrReadOnly]
     pagination_class = LargeResultSetPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['category', 'owner']
@@ -53,26 +53,14 @@ class ProductApiView(ModelViewSet):
         
         return Response(request.data, status=status.HTTP_201_CREATED)
     
-    @action(detail=True, methods=['POST'])
-    def favorite(self, request, pk, *args, **kwargs):
-        favorite_obj, _ = Favorite.objects.get_or_create(product_id=pk, owner=request.user)
-        favorite_obj.favorite = not favorite_obj.favorite
-        favorite_obj.save()
-        status = 'added to favorite'
-        if not favorite_obj.favorite:
-            status = 'removed from favorite'
-            
-        return Response({'status': status})
-    
 
-class CategoryApiView(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
+class CategoryViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     
     
-   
-class CommentApiView(ModelViewSet):
+class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsCommentOwner]
@@ -84,4 +72,19 @@ class CommentApiView(ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.filter(owner=self.request.user)
+        return queryset
+    
+
+class FavoriteViewSet(ModelViewSet):
+    queryset = Favorite.objects.all()
+    serializer_class = FavoriteSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+        
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(owner=self.request.user.id)
         return queryset

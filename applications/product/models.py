@@ -29,16 +29,8 @@ class Product(models.Model):
     
     class Meta:
         ordering = ['-id']
-    
-    
-class Image(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='images/')
-    
-    def __str__(self):
-        return self.product
+
         
-    
     
 class Comment(models.Model):
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='comments', null=True)
@@ -48,7 +40,7 @@ class Comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self) -> str:
-        return f'{self.owner.username} {self.product.title}'
+        return f'{self.owner}:  {self.product.title}'
     
    
     
@@ -61,6 +53,13 @@ class Like(models.Model):
         return f'{self.owner} - {self.like}'
     
     
+class Favorite(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite') 
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='favorite')
+    favorite = models.BooleanField(default=True)
+    
+    def __str__(self) -> str:
+        return f'{self.product} - added to favorite'
     
     
 class Rating(models.Model):
@@ -77,10 +76,3 @@ class Rating(models.Model):
         return f'{self.owner} - {self.rating}'
     
     
-class Favorite(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite') 
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='favorite')
-    favorite = models.BooleanField(default=False)
-    
-    def __str__(self) -> str:
-        return f'{self.owner} - {self.favorite}'

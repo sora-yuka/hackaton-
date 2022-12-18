@@ -47,10 +47,13 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'django_filters',
     'drf_yasg',
+    'corsheaders',
     
     # my apps
     'applications.account',
-    'applications.product'
+    'applications.product',
+    'applications.file',
+    'applications.order',
 ]
 
 SITE_ID = 1

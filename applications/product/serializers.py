@@ -1,16 +1,14 @@
 from rest_framework import serializers
 from django.db.models import Avg
 from .models import *
+from applications.file.sersializers import FileSerializer
+from applications.file.models import File
 
 
-class ImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Image
-        fields = '__all__'
   
         
 class CommentSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
+    owner = serializers.ReadOnlyField(source='owner.email')
     class Meta:
         model = Comment
         fields = '__all__'
@@ -19,7 +17,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     owner = serializers.EmailField(required=False)
     comments = CommentSerializer(many=True, read_only = True)
-    images = ImageSerializer(many=True, read_only=True)
+    files = FileSerializer(many=True, read_only=True)
     
     
     class Meta:
@@ -32,8 +30,8 @@ class ProductSerializer(serializers.ModelSerializer):
         files_data = request.FILES
         product = Product.objects.create(**validated_data)
 
-        for image in files_data.getlist('images'):
-            Image.objects.create(product=product, image=image)  
+        for file in files_data.getlist('files'):
+            File.objects.create(product=product, file=file)  
         return product
     
         
@@ -42,7 +40,6 @@ class ProductSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         rep['likes'] = instance.likes.filter(like=True).count()
         rep['rating'] = instance.ratings.all().aggregate(Avg('rating'))['rating__avg']
-        rep['favorite'] = instance.favorite.filter(favorite=True)
         return rep
     
     
@@ -60,8 +57,14 @@ class CategorySerializer(serializers.ModelSerializer):
         
         
 class RatingSerializer(serializers.ModelSerializer):
-    # owner = serializers.ReadOnlyField()
     rating = serializers.IntegerField(min_value=1, max_value=5)
     class Meta:
         model = Rating
         fields = ['rating']
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.email')
+    class Meta:
+        model = Favorite
+        exclude = ['favorite']

@@ -1,17 +1,18 @@
 from django.contrib import admin
+from applications.file.models import File
+from applications.order.models import Order
 from .models import (
-    Product, Category, Image, Comment, Rating, Like, Favorite
+    Product, Category, Comment, Rating, Like, Favorite
 )
 
-
-class ImageAdmin(admin.TabularInline):
-    model = Image
+class FileAdmin(admin.TabularInline):
+    model = File
     fields = ('image',)
     max_num = 10
 
 class PostAdmin(admin.ModelAdmin):
     inlines = [
-        ImageAdmin
+        FileAdmin
     ]
     list_display = ['id', 'title', 'product_count_like']
     
@@ -20,8 +21,8 @@ class PostAdmin(admin.ModelAdmin):
 
 admin.site.register(Product)
 admin.site.register(Category)
-admin.site.register(Image)
 admin.site.register(Comment)
 admin.site.register(Rating)
 admin.site.register(Like)
 admin.site.register(Favorite)
+admin.site.register(Order)
